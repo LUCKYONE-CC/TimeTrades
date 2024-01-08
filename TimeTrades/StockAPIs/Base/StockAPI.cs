@@ -11,6 +11,7 @@ namespace TimeTrades.StockAPIs.Contracts
         }
         public event InteractionHandler NewExchangeDataReceived;
         protected string APIKey { get; }
+        public abstract decimal PricePerRequest { get; }
         protected abstract IEnumerable<Symbol> SubscribedSymbols { get; set; }
         protected void OnNewExchangeDataReceived(ExchangeData exchangeData)
         {
