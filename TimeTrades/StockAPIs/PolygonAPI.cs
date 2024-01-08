@@ -4,10 +4,10 @@ using TimeTrades.StockAPIs.Contracts;
 
 namespace TimeTrades.StockAPIs
 {
-    public class AlphaStockAPI : StockAPI
+    public class PolygonAPI : StockAPI
     {
         private readonly string apiKey;
-        public AlphaStockAPI(string apiKey) : base(apiKey)
+        public PolygonAPI(string apiKey) : base(apiKey)
         {
             this.apiKey = apiKey;
         }
@@ -28,18 +28,12 @@ namespace TimeTrades.StockAPIs
             List<TimeSpan> supportedIntervals = new List<TimeSpan>
             {
                 TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(5),
                 TimeSpan.FromMinutes(1),
-                TimeSpan.FromMinutes(5),
-                TimeSpan.FromMinutes(15),
-                TimeSpan.FromMinutes(30),
                 TimeSpan.FromHours(1),
-                TimeSpan.FromHours(4),
-                TimeSpan.FromHours(8),
-                TimeSpan.FromHours(12),
                 TimeSpan.FromDays(1),
                 TimeSpan.FromDays(7),
                 TimeSpan.FromDays(30),
+                TimeSpan.FromDays(3 * 30),
                 TimeSpan.FromDays(365)
             };
 

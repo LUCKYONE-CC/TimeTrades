@@ -62,7 +62,7 @@ namespace TimeTrades.StockAPIs.Contracts
                         }
                         foreach (var symbol in SubscribedSymbols)
                         {
-                            var exchangeData = GetExchangeData(symbol);
+                            var exchangeData = GetRealTimeExchangeData(symbol);
                             OnNewExchangeDataReceived(exchangeData);
                         }
                         await Task.Delay(timeSpan);

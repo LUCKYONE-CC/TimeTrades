@@ -8,7 +8,7 @@ namespace Sample
     {
         static async Task Main(string[] args)
         {
-            StockAPI stockAPI = new AlphaStockAPI("123456789");
+            StockAPI stockAPI = new PolygonAPI("123456789");
             var allSymbols = stockAPI.GetSupportedSymbols().ToList();
             stockAPI.SubscribeToSymbols(allSymbols);
             TimeTrader timeTrader = new TimeTrader(stockAPI);
