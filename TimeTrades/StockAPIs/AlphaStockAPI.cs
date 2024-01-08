@@ -12,6 +12,7 @@ namespace TimeTrades.StockAPIs
             this.apiKey = apiKey;
         }
         protected override IEnumerable<Symbol> SubscribedSymbols { get; set; }
+        protected override bool HasStarted { get; set; }
         public override decimal PricePerRequest => 1m;
         public override IEnumerable<Symbol> GetSupportedSymbols()
         {
@@ -63,7 +64,7 @@ namespace TimeTrades.StockAPIs
 
             SubscribedSymbols = validSymbols;
         }
-        protected override ExchangeData GetExchangeData(Symbol symbol)
+        protected override ExchangeData GetRealTimeExchangeData(Symbol symbol)
         {
             ///Make your API-Call here
             return new ExchangeData() { Str = "Test"};

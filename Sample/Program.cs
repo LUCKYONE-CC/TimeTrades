@@ -18,7 +18,10 @@ namespace Sample
                 Console.WriteLine(exchangeData.Str);
             };
 
-            await timeTrader.StockAPI.Start(TimeSpan.FromSeconds(5));
+            var cancellationTokenSource = await timeTrader.StockAPI.StartRealTimeDataReceiver(TimeSpan.FromSeconds(5));
+            Console.WriteLine("Press any key to stop");
+            Console.ReadKey();
+            cancellationTokenSource.Cancel();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TimeTrades.StockAPIs.Contracts
         }
         public event InteractionHandler NewExchangeDataReceived;
         protected string APIKey { get; }
+        protected abstract bool HasStarted { get; set; }
         public abstract decimal PricePerRequest { get; }
         protected abstract IEnumerable<Symbol> SubscribedSymbols { get; set; }
         protected void OnNewExchangeDataReceived(ExchangeData exchangeData)
@@ -23,12 +24,18 @@ namespace TimeTrades.StockAPIs.Contracts
         public abstract IEnumerable<Symbol> GetSupportedSymbols();
         public abstract IEnumerable<TimeSpan> GetSupportedIntervals();
         public abstract void SubscribeToSymbols(List<Symbol> symbolsToSubscribe);
-        protected abstract ExchangeData GetExchangeData(Symbol symbol);
-        public async Task<CancellationToken> Start(TimeSpan timeSpan)
+        protected abstract ExchangeData GetRealTimeExchangeData(Symbol symbol);
+        public async Task<CancellationTokenSource> StartRealTimeDataReceiver(TimeSpan timeSpan)
         {
             try
             {
-                CancellationToken cancellationToken = new CancellationToken();
+                if(HasStarted)
+                {
+                    throw new ArgumentException("API has already started");
+                }
+
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                CancellationToken token = cancellationTokenSource.Token;
                 var supportedIntervals = GetSupportedIntervals().ToList();
 
                 if (supportedIntervals == null || supportedIntervals.Count == 0)
@@ -45,10 +52,9 @@ namespace TimeTrades.StockAPIs.Contracts
                 {
                     throw new ArgumentException("TimeSpan not supported");
                 }
-
-                await Task.Run(async () =>
+                Task apiTask = new Task(async () =>
                 {
-                    while (!cancellationToken.IsCancellationRequested)
+                    while (!token.IsCancellationRequested)
                     {
                         if (SubscribedSymbols == null || SubscribedSymbols.ToList().Count == 0)
                         {
@@ -61,9 +67,12 @@ namespace TimeTrades.StockAPIs.Contracts
                         }
                         await Task.Delay(timeSpan);
                     }
+                    HasStarted = false;
                 });
 
-                return cancellationToken;
+                apiTask.Start();
+
+                return cancellationTokenSource;
             }
             catch (Exception ex)
             {
