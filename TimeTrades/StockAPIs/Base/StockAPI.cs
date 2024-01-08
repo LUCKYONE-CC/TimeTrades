@@ -11,8 +11,7 @@ namespace TimeTrades.StockAPIs.Contracts
         }
         public event InteractionHandler NewExchangeDataReceived;
         protected string APIKey { get; }
-        public abstract List<Symbol> SupportedSymbols { get; }
-        public abstract List<TimeSpan> SupportedIntervals { get; }
+        protected abstract IEnumerable<Symbol> SubscribedSymbols { get; set; }
         protected void OnNewExchangeDataReceived(ExchangeData exchangeData)
         {
             if (NewExchangeDataReceived != null)
@@ -27,23 +26,37 @@ namespace TimeTrades.StockAPIs.Contracts
         public async Task<CancellationToken> Start(TimeSpan timeSpan)
         {
             CancellationToken cancellationToken = new CancellationToken();
-            if (GetSupportedIntervals().Any(x => x != timeSpan))
+            var supportedIntervals = GetSupportedIntervals().ToList();
+
+            if(supportedIntervals == null || supportedIntervals.Count == 0)
             {
-                throw new ArgumentException("Interval is not supported on this api");
+                throw new ArgumentException("No Intervals supported");
             }
-            await Task.Run(() =>
+
+            if(timeSpan == null || timeSpan == TimeSpan.Zero)
+            {
+                throw new ArgumentException("TimeSpan cannot be null or zero");
+            }
+
+            if(supportedIntervals.All(x => x != timeSpan))
+            {
+                throw new ArgumentException("TimeSpan not supported");
+            }
+
+            await Task.Run(async () =>
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    if(SupportedSymbols == null || SupportedSymbols.Count == 0)
+                    if (SubscribedSymbols == null || SubscribedSymbols.ToList().Count == 0)
                     {
                         throw new ArgumentException("No Symbols subscribed");
                     }
-                    foreach(var symbol in SupportedSymbols)
+                    foreach (var symbol in SubscribedSymbols)
                     {
-                        OnNewExchangeDataReceived(new ExchangeData());
+                        var exchangeData = GetExchangeData(symbol);
+                        OnNewExchangeDataReceived(exchangeData);
                     }
-                    Task.Delay(timeSpan);
+                    await Task.Delay(timeSpan);
                 }
             });
 

@@ -11,8 +11,7 @@ namespace TimeTrades.StockAPIs
         {
             this.apiKey = apiKey;
         }
-        public override List<Symbol> SupportedSymbols { get; }
-        public override List<TimeSpan> SupportedIntervals { get; }
+        protected override IEnumerable<Symbol> SubscribedSymbols { get; set; }
 
         public override IEnumerable<Symbol> GetSupportedSymbols()
         {
@@ -27,6 +26,8 @@ namespace TimeTrades.StockAPIs
         {
             List<TimeSpan> supportedIntervals = new List<TimeSpan>
             {
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(5),
                 TimeSpan.FromMinutes(1),
                 TimeSpan.FromMinutes(5),
                 TimeSpan.FromMinutes(15),
@@ -46,22 +47,26 @@ namespace TimeTrades.StockAPIs
 
         public override void SubscribeToSymbols(List<Symbol> symbolsToSubscribe)
         {
-            var validSymbols = symbolsToSubscribe.Intersect(GetSupportedSymbols()).ToList();
-
-            validSymbols.ForEach(symbol =>
+            var validSymbols = new List<Symbol>();
+            symbolsToSubscribe.ForEach(symbol =>
             {
-                validSymbols.Add(symbol);
+                if (GetSupportedSymbols().Any(x => x.Name == symbol.Name))
+                {
+                    validSymbols.Add(symbol);
+                }
             });
 
             if (validSymbols.Count == 0)
             {
                 throw new ArgumentException("No valid symbols selected.");
             }
+
+            SubscribedSymbols = validSymbols;
         }
         protected override ExchangeData GetExchangeData(Symbol symbol)
         {
             ///Make your API-Call here
-            return new ExchangeData();
+            return new ExchangeData() { Str = "Test"};
         }
     }
 }
