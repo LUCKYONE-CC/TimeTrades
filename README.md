@@ -7,3 +7,7 @@ TimeTrades not only offers you the possibility to use already implemented APIs, 
 Statistical evaluations are also planned, which can be obtained directly from the retrieved data. 
 
 Overall, TimeTrades is a wrapper that supports you in developing algorithms and bots without limiting your flexibility. 
+
+<br><h2></h2><br>
+
+🚧 Currently under development 🚧
