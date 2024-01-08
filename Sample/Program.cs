@@ -1,5 +1,4 @@
 ﻿using TimeTrades;
-using TimeTrades.Models;
 using TimeTrades.StockAPIs;
 using TimeTrades.StockAPIs.Contracts;
 

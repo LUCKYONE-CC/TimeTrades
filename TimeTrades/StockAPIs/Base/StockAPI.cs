@@ -26,42 +26,49 @@ namespace TimeTrades.StockAPIs.Contracts
         protected abstract ExchangeData GetExchangeData(Symbol symbol);
         public async Task<CancellationToken> Start(TimeSpan timeSpan)
         {
-            CancellationToken cancellationToken = new CancellationToken();
-            var supportedIntervals = GetSupportedIntervals().ToList();
-
-            if(supportedIntervals == null || supportedIntervals.Count == 0)
+            try
             {
-                throw new ArgumentException("No Intervals supported");
-            }
+                CancellationToken cancellationToken = new CancellationToken();
+                var supportedIntervals = GetSupportedIntervals().ToList();
 
-            if(timeSpan == null || timeSpan == TimeSpan.Zero)
-            {
-                throw new ArgumentException("TimeSpan cannot be null or zero");
-            }
-
-            if(supportedIntervals.All(x => x != timeSpan))
-            {
-                throw new ArgumentException("TimeSpan not supported");
-            }
-
-            await Task.Run(async () =>
-            {
-                while (!cancellationToken.IsCancellationRequested)
+                if (supportedIntervals == null || supportedIntervals.Count == 0)
                 {
-                    if (SubscribedSymbols == null || SubscribedSymbols.ToList().Count == 0)
-                    {
-                        throw new ArgumentException("No Symbols subscribed");
-                    }
-                    foreach (var symbol in SubscribedSymbols)
-                    {
-                        var exchangeData = GetExchangeData(symbol);
-                        OnNewExchangeDataReceived(exchangeData);
-                    }
-                    await Task.Delay(timeSpan);
+                    throw new ArgumentException("No Intervals supported");
                 }
-            });
 
-            return cancellationToken;
+                if (timeSpan == null || timeSpan == TimeSpan.Zero)
+                {
+                    throw new ArgumentException("TimeSpan cannot be null or zero");
+                }
+
+                if (supportedIntervals.All(x => x != timeSpan))
+                {
+                    throw new ArgumentException("TimeSpan not supported");
+                }
+
+                await Task.Run(async () =>
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        if (SubscribedSymbols == null || SubscribedSymbols.ToList().Count == 0)
+                        {
+                            throw new ArgumentException("No Symbols subscribed");
+                        }
+                        foreach (var symbol in SubscribedSymbols)
+                        {
+                            var exchangeData = GetExchangeData(symbol);
+                            OnNewExchangeDataReceived(exchangeData);
+                        }
+                        await Task.Delay(timeSpan);
+                    }
+                });
+
+                return cancellationToken;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
