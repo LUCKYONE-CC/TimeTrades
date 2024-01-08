@@ -12,10 +12,6 @@ namespace TimeTrades
             StockAPI = stockAPI;
 
         }
-        //public async Task ChangeInterval(Interval interval)
-        //{
-        //    Interval = interval;
-        //}
         private async Task SendNewData(ExchangeData exchangeData)
         {
             if (NewExchangeDataReceived != null)
